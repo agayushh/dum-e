@@ -1,0 +1,36 @@
+{
+  "name": "@dum-e/cli",
+  "module": "src/index.tsx",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "dum-e": "./bin/dum-e"
+  },
+  "scripts": {
+    "dev": "bun run --watch src/index.tsx",
+    "build": "bun build src/index.tsx --outdir dist --target bun"
+  },
+  "devDependencies": {
+    "@dum-e/server": "workspace:*",
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@ai-sdk/react": "^3.0.186",
+    "@dum-e/shared": "workspace:*",
+    "@opentui/core": "^0.1.97",
+    "@opentui/react": "^0.1.97",
+    "ai": "^6.0.184",
+    "date-fns": "^4.1.0",
+    "hono": "^4.12.12",
+    "open": "^11.0.0",
+    "opentui-spinner": "^0.0.6",
+    "pretty-ms": "^9.3.0",
+    "react": "^19.2.4",
+    "react-router": "^7.14.0",
+    "zod": "^4.3.6"
+  }
+}
