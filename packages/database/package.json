@@ -7,15 +7,17 @@
     "./client": "./src/client.ts"
   },
   "scripts": {
-    "db:generate": "bunx prisma generate"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",
-    "prisma": "^7.7.0"
+    "drizzle-kit": "^0.31.11"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.7.0",
-    "@prisma/client": "^7.7.0",
-    "dotenv": "^17.4.1"
+    "@paralleldrive/cuid2": "^3.3.0",
+    "dotenv": "^17.4.1",
+    "drizzle-orm": "^0.45.3"
   }
 }

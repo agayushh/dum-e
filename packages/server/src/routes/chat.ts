@@ -9,8 +9,9 @@ import {
   type LanguageModelUsage,
   type UIMessage,
 } from "ai";
+import { and, eq } from "drizzle-orm";
+import { sessions } from "@dum-e/database";
 import { db } from "@dum-e/database/client";
-import type { Prisma } from "@dum-e/database";
 import { 
   getToolContracts, 
   modeSchema, 
@@ -72,9 +73,11 @@ const app = new Hono<AuthenticatedEnv>()
       const userId = c.get("userId");
       const { id, messages, mode, model } = c.req.valid("json");
 
-      const session = await db.session.findUnique({
-        where: { id, userId },
-      });
+      const [session] = await db
+        .select()
+        .from(sessions)
+        .where(and(eq(sessions.id, id), eq(sessions.userId, userId)))
+        .limit(1);
 
       if (!session) {
         return c.json({ error: "Session not found" }, 404);
@@ -142,12 +145,10 @@ const app = new Hono<AuthenticatedEnv>()
 
           if (hasPendingToolCalls(event.responseMessage)) return;
 
-          await db.session.update({
-            where: { id, userId },
-            data: {
-              messages: event.messages as unknown as Prisma.InputJsonValue,
-            },
-          });
+          await db
+            .update(sessions)
+            .set({ messages: event.messages })
+            .where(and(eq(sessions.id, id), eq(sessions.userId, userId)));
 
           if (!completedUsage) return;
 

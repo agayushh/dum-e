@@ -2,6 +2,8 @@ import { Hono } from "hono";
 // import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
+import { and, desc, eq } from "drizzle-orm";
+import { sessions } from "@dum-e/database";
 import { db } from "@dum-e/database/client";
 
 import type { AuthenticatedEnv } from "../middleware/require-auth";
@@ -23,17 +25,17 @@ const app = new Hono<AuthenticatedEnv>()
   .get("/", async (c) => {
     const userId = c.get("userId");
 
-    const sessions = await db.session.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        createdAt: true,
-      },
-    });
+    const rows = await db
+      .select({
+        id: sessions.id,
+        title: sessions.title,
+        createdAt: sessions.createdAt,
+      })
+      .from(sessions)
+      .where(eq(sessions.userId, userId))
+      .orderBy(desc(sessions.createdAt));
 
-    return c.json(sessions);
+    return c.json(rows);
   })
   .get("/:id", async (c) => {
     // MOCK: Uncomment to simulate slow session loading
@@ -48,9 +50,11 @@ const app = new Hono<AuthenticatedEnv>()
     const id = c.req.param("id");
     const userId = c.get("userId");
     
-    const session = await db.session.findUnique({
-      where: { id, userId },
-    });
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(and(eq(sessions.id, id), eq(sessions.userId, userId)))
+      .limit(1);
 
     if (!session) {
       return c.json({ error: "Session not found" }, 404);
@@ -71,12 +75,13 @@ const app = new Hono<AuthenticatedEnv>()
     const userId = c.get("userId");
     const data = c.req.valid("json");
 
-    const session = await db.session.create({
-      data: {
-        ...data,
+    const [session] = await db
+      .insert(sessions)
+      .values({
+        title: data.title,
         userId,
-      },
-    });
+      })
+      .returning();
 
     return c.json(session, 201);
   });

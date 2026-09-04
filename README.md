@@ -7,7 +7,7 @@
 
 <p>A terminal-based AI coding agent.</p>
 
-<p>Plan, chat, and build inside your local project with a Bun-powered CLI, Hono API, Prisma ORM, Clerk auth, and AI SDK streaming.</p>
+<p>Plan, chat, and build inside your local project with a Bun-powered CLI, Hono API, Drizzle ORM, Clerk auth, and AI SDK streaming.</p>
 
 <br />
 
@@ -58,7 +58,7 @@ git checkout 07-tool-calling  # example: jump to tool calling
 - **Streaming Responses** - Stream model output through the AI SDK with persisted session history
 - **Local Project Tools** - Read files, list directories, glob, grep, write files, edit files, and run shell commands inside the current project
 - **Multi-Model Support** - Use supported Anthropic and OpenAI chat models from a shared model registry
-- **Persistent Sessions** - Store authenticated user sessions and messages in Postgres via Prisma
+- **Persistent Sessions** - Store authenticated user sessions and messages in Postgres via Drizzle
 - **Clerk OAuth** - Authenticate the CLI through a browser-based Clerk OAuth flow
 - **Usage Billing** - Meter AI usage as credits through Polar before allowing session and chat actions
 
@@ -178,13 +178,11 @@ The CLI upgrade flow calls `/billing/checkout`, which opens a Polar checkout URL
 
 ### 5. Set up the database
 
-Generate the Prisma client:
+Push the Drizzle schema to the configured Postgres database:
 
 ```bash
-bun run --cwd packages/database db:generate
+bun run --cwd packages/database db:push
 ```
-
-Apply your Prisma schema to the configured Postgres database using your preferred Prisma workflow.
 
 ### 6. Run the server
 
@@ -222,7 +220,7 @@ packages/
 │       ├── lib/                 # API client, auth, OAuth, local tool execution
 │       ├── providers/           # Dialog, keyboard, prompt, theme, toast providers
 │       └── screens/             # Home, new session, and session screens
-├── database/                    # Prisma schema, generated client, database exports
+├── database/                    # Drizzle schema and database client
 ├── server/                      # Hono API for auth, billing, sessions, and chat
 └── shared/                      # Shared schemas, tool contracts, and model registry
 ```
@@ -235,7 +233,9 @@ packages/
 | `bun run dev:server` | Start the Hono server with hot reload |
 | `bun run build:cli` | Build the CLI package |
 | `bun run link:cli` | Build and link the `dum-e` executable |
-| `bun run --cwd packages/database db:generate` | Generate the Prisma client |
+| `bun run --cwd packages/database db:push` | Push the Drizzle schema to Postgres |
+| `bun run --cwd packages/database db:generate` | Generate a Drizzle SQL migration |
+| `bun run --cwd packages/database db:migrate` | Apply generated Drizzle migrations |
 
 ## Packages
 
@@ -243,5 +243,5 @@ packages/
 |---------|-------------|
 | `@dum-e/cli` | Terminal UI and client-side tool execution |
 | `@dum-e/server` | Hono API, AI streaming, auth checks, and billing ingestion |
-| `@dum-e/database` | Prisma client and database schema |
+| `@dum-e/database` | Drizzle client and database schema |
 | `@dum-e/shared` | Shared Zod schemas, AI tool contracts, and model definitions |

@@ -7,8 +7,7 @@
   },
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
-    "postinstall": "bun run --cwd ../database db:generate"
+    "build": "bun build src/index.ts --outdir dist --target bun"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.68",
